@@ -1,1 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoNames API Demo with PHP & cURL</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>GeoNames API Demo with PHP & JavaScript</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>API Name</th>
+                <th>API Description & User Input</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Postal Code Lookup API -->
+            <tr>
+                <td>Postal Code Lookup</td>
+                <td>
+                    <form id="postalCodeForm">
+                        <label for="postalcode">Postal Code:</label>
+                        <input type="text" id="postalcode" name="postalcode" required>
+                        <br>
+                        <label for="country">Country (ISO code):</label>
+                        <input type="text" id="country" name="country" required>
+                        <br>
+                        <button type="submit">Find Nearby Postal Codes</button>
+                    </form>
+                </td>
+                <td><div id="postalCodeResult"></div></td>
+            </tr>
 
+            <!-- Find Nearby Wikipedia Entries API -->
+            <tr>
+                <td>Find Nearby Wikipedia Entries</td>
+                <td>
+                    <form id="wikiForm">
+                        <label for="lat">Latitude:</label>
+                        <input type="text" id="lat" name="lat" required>
+                        <br>
+                        <label for="lng">Longitude:</label>
+                        <input type="text" id="lng" name="lng" required>
+                        <br>
+                        <button type="submit">Find Nearby Wikipedia Entries</button>
+                    </form>
+                </td>
+                <td><div id="wikiResult"></div></td>
+            </tr>
+
+            <!-- Time Zone API -->
+            <tr>
+                <td>Time Zone</td>
+                <td>
+                    <form id="timezoneForm">
+                        <label for="timezoneLat">Latitude:</label>
+                        <input type="text" id="timezoneLat" name="timezoneLat" required>
+                        <br>
+                        <label for="timezoneLng">Longitude:</label>
+                        <input type="text" id="timezoneLng" name="timezoneLng" required>
+                        <br>
+                        <button type="submit">Get Time Zone</button>
+                    </form>
+                </td>
+                <td><div id="timezoneResult"></div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="result"></div>
+<script src="script.js"></script>
+</body>
+</html>
