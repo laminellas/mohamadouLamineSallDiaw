@@ -7,7 +7,7 @@
                 const formData = new FormData(form); // Collect form data
                 formData.append('apiType', apiType); // Add apiType to the formData
 
-                fetch('process.php', {
+                fetch('index.php', {
                     method: 'POST',
                     body: formData
                 })
