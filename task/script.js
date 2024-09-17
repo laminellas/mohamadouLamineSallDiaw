@@ -1,6 +1,6 @@
 // Function to handle AJAX form submission
         
-$('#postalCode').click(function() {
+$('#postalCodebtn').click(function() {
     $.ajax({
         url:"task1\postalcode.php",
         type: 'POST',
