@@ -1,9 +1,9 @@
 <?php
-ini_set('display_error', 'on');
+ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
-$url='http://api.geonames.org/findNearbyPostalCodes?&lat=' . $_REQUEST['lat'] . '&long=' . $_REQUEST['long'] .'&username=alamine';
+$url='http://api.geonames.org/findNearbyPostalCodesJSON?formatted=true&postalcode=' . $_REQUEST['postalcode'] . '&country=' . $_REQUEST['country'] .'&radius=10&username=alamine&style=full';
 
 
 $ch = curl_init();
@@ -21,9 +21,11 @@ $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returndIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-$output['data'] = $decode['geonames'];
+$output['data'] = $decode;
+$output['url'] = $url;
 
 header('Content-Type: application/json; chartset=UTF-8');
 
 echo json_encode($output);
 ?>
+
