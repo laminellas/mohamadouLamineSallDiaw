@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoNames API Demo with PHP & cURL</title>
+    
+  
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>GeoNames API Demo with PHP & JavaScript</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>API Name</th>
+                <th>API Description & User Input</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Postal Code Lookup API -->
+            <tr>
+                <td>Postal Code Lookup</td>
+                <td>
+                    <form id="postalCodeForm">
+                        <label for="postalcode">postalcode:</label>
+                        <input type="text" id="postalcode" name="postalcode" required>
+                        <br>
+                        <label for="country">country:</label>
+                        <select name="country" id="country">
+                            <option value="ch">CH</option>
+                            <option value="fr">FR</option>
+                            <option value="gb">GB</option>
+                            <option value="sn">SN</option>
+                          </select>
+                        <br>
+                        <button type="button" id="postalcodebtn">Find Nearby Postal Codes</button>
+                    </form>
+                </td>
+                <td><div id="postalCodeResult"></div></td>
+                <!-- <td><div id="postalCodeResult1"></div></td>
+                <td><div id="postalCodeResult2"></div></td> -->
+            </tr>
+
+            <!-- Find Nearby Wikipedia Entries API -->
+            <tr>
+                <td>Find Nearby Wikipedia Entries</td>
+                <td>
+                    <form id="wikiForm">
+                        <label for="latitude">Latitude:</label>
+                        <input type="text" id="latitude" name="latitude" required>
+                        <br>
+                        <label for="longitude">Longitude:</label>
+                        <input type="text" id="longitude" name="longitude" required>
+                        <br>
+                        <button type="button" id="Wikipediabtn">Find Nearby Wikipedia Entries</button>
+                    </form>
+                </td>
+                <td><div id="wikiResult"></div></td>
+            </tr>
+
+            <!-- Time Zone API -->
+            <tr>
+                <td>Time Zone</td>
+                <td>
+                    <form id
+                    ="timezoneForm">
+                        <label for="timezoneLat">Latitude:</label>
+                        <input type="text" id="timezoneLat" name="timezoneLat" required>
+                        <br>
+                        <label for="timezoneLng">Longitude:</label>
+                        <input type="text" id="timezoneLng" name="timezoneLng" required>
+                        <br>
+                        <button type="button" id="timeZonebtn">Get Time Zone</button>
+                    </form>
+                </td>
+                <td><div id="timezoneResult"></div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="result"></div>
+   
+    
+    
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/back.js"></script>
+
+    
+</body>
+</html> 
