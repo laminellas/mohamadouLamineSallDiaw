@@ -5,7 +5,11 @@ $('#drop').click(function() {
       dataType: 'json',
       success: function(result) {
          console.log(result);
-   },
+   },error:function(jqXHR){
+
+      console.log(jqXHR);
+  
     }
-)
+    });
 });
+    
