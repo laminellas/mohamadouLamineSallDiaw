@@ -1,15 +1,24 @@
-$('#drop').click(function() {
+
    $.ajax({
       url: "profile.php",
       type: 'GET',
       dataType: 'json',
       success: function(result) {
          console.log(result);
-   },error:function(jqXHR){
+         const $dropdown = $('#countryDropdown'); 
 
-      console.log(jqXHR);
+         
+         $.each(result, function(index, country) {
+             $dropdown.append(
+                 $('<option></option>')
+                     .val(country.iso) 
+                     .text(country.name) 
+                  );
+         })
+     },error:function(jqXHR){
+
+        console.log(jqXHR);
   
     }
-    });
-});
     
+}); 
