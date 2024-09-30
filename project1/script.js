@@ -84,10 +84,10 @@ $(document).ready(function(){
               } else {
                   $('#result').html('Error: ' + data.message);
               }
-          },
-          error: function(){
-              $('#result').html('An error occurred while fetching exchange rate data.');
-          }
+          },error:function(jqXHR, textStatus, errorThrown){
+
+      console.log(jqXHR);
+
       });
   });
 });
