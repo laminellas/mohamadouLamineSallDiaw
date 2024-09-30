@@ -66,3 +66,28 @@ $(document).ready(function () {
 
 })
 
+//currencyExchange API
+$(document).ready(function(){
+  $('#convert').on('click', function(){
+      var toCurrency = $('#currency').val();
+      $.ajax({
+          url: 'currencyExchange.php', 
+          type: 'GET',
+          data: {
+              to_currency: toCurrency
+          },
+          success: function(response){
+              var data = JSON.parse(response);
+              console.log(result);
+              if(data.success) {
+                  $('#result').html('1 USD = ' + data.rate + ' ' + data.currency);
+              } else {
+                  $('#result').html('Error: ' + data.message);
+              }
+          },
+          error: function(){
+              $('#result').html('An error occurred while fetching exchange rate data.');
+          }
+      });
+  });
+});
