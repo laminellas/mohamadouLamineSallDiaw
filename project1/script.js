@@ -57,8 +57,7 @@ $(document).ready(function () {
     layers: [streets]
   }).setView([54.5, -4], 6);
   
-  // setView is not required in your application as you will be
-  // deploying map.fitBounds() on the country border polygon
+  
 
   layerControl = L.control.layers(basemaps).addTo(map);
 
