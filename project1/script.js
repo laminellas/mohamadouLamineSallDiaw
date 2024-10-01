@@ -119,10 +119,10 @@ $.ajax({
         });
         
         output += '</ul>';
-        $('modal-body').html(output);
+        $('#modal-body').html(output);
     } else {
         // Error handling if API request fails
-        $('modal-body').html('<h2>Error fetching exchange rates: ' + data.status.description + '</h2>');
+        $('#modal-body').html('<h2>Error fetching exchange rates: ' + data.status.description + '</h2>');
     }
 },error:function(jqXHR, textStatus, errorThrown){
 
