@@ -47,8 +47,11 @@ var basemaps = {
 // buttons
 var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
   $("#exampleModal").modal("show");
+  
 });
-
+var currencyBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
+  $("#modal1").modal("show");
+});
 // ---------------------------------------------------------
 // EVENT HANDLERS
 // ---------------------------------------------------------
@@ -66,6 +69,7 @@ $(document).ready(function () {
   
   // Add the info button
   infoBtn.addTo(map);
+  currencyBtn.addTo(map);
 
   // ---------------------------------------------------------
   // GET THE DEVICE LOCATION USING GEOLOCATION API
@@ -96,17 +100,30 @@ $(document).ready(function () {
     alert("Geolocation is not supported by your browser.");
   }
 });
-
 $('#countryDropdown').change(function(){
 $.ajax({
   url: "currencyExchange.php",
   type: 'GET',
   dataType: 'json',
-  success: function(response) {
-     console.log(response);
-    $('#modal1').html(result.data.attribute);
-     
- },error:function(jqXHR, textStatus, errorThrown){
+  success: function (data) {
+    console.log(data);
+    if (data.status.code === "200") {
+        // Successfully retrieved exchange rates
+        var rates = data.data;
+        var output = '<h2>Exchange Rates</h2><ul>';
+        
+        // Loop through exchange rates and display them
+        $.each(rates, function (currency, rate) {
+            output += '<li><strong>' + currency + '</strong>: ' + rate + '</li>';
+        });
+        
+        output += '</ul>';
+        $('modal-body').html(output);
+    } else {
+        // Error handling if API request fails
+        $('modal-body').html('<h2>Error fetching exchange rates: ' + data.status.description + '</h2>');
+    }
+},error:function(jqXHR, textStatus, errorThrown){
 
     console.log(jqXHR);
 
