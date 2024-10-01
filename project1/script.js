@@ -96,3 +96,21 @@ $(document).ready(function () {
     alert("Geolocation is not supported by your browser.");
   }
 });
+
+$('#countryDropdown').change(function(){
+$.ajax({
+  url: "currencyExchange.php",
+  type: 'GET',
+  dataType: 'json',
+  success: function(response) {
+     console.log(response);
+    $('#modal1').html(result.data.attribute);
+     
+ },error:function(jqXHR, textStatus, errorThrown){
+
+    console.log(jqXHR);
+
+}
+
+}); 
+});
