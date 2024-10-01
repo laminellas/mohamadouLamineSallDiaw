@@ -1,48 +1,46 @@
 <?php
-$apiKey = '17ba9391059909756be63383a054282e';
-$baseCurrency = 'USD';    // Base currency to compare against others
 
-// Get the currency from the AJAX request (e.g., USD to EUR)
-$toCurrency = isset($_GET['to_currency']) ? $_GET['to_currency'] : 'EUR';
+// API URL 
+$url = "https://openexchangerates.org/api/latest.json?app_id=8d99e8d17d7a47d0923a8e2e83b7ac15";
 
-// API URL (example with Fixer.io API)
-$url = "http://data.fixer.io/api/latest?access_key=$apiKey&base=$baseCurrency&symbols=$toCurrency";
 
-// Initialize cURL session
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-// Execute the cURL request
-$response = curl_exec($ch);
-curl_close($ch);
-
-// Check if the response contains valid data
-if ($response) {
-    // Decode the JSON response from the API
-    $data = json_decode($response, true);
-
-    // Check if the request was successful
-    if (isset($data['success']) && $data['success'] === true) {
-        // Send back exchange rate in JSON format
-        $exchangeRate = $data['rates'][$toCurrency];
-        echo json_encode([
-            'success' => true,
-            'rate' => $exchangeRate,
-            'currency' => $toCurrency
-        ]);
-    } else {
-        // Return error message
-        echo json_encode([
-            'success' => false,
-            'message' => 'Unable to retrieve exchange rate data.'
-        ]);
-    }
-} else {
-    // Handle the case where the API request fails
-    echo json_encode([
-        'success' => false,
-        'message' => 'API request failed.'
-    ]);
+// Function to make the API call and get exchange rates
+function getExchangeRates($url) {
+    // Initialize cURL
+    $ch = curl_init();
+    
+    // Set the URL and other required options for cURL
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Return the output as a string instead of outputting it directly
+    
+    // Execute the request
+    $response = curl_exec($ch);
+    
+    // Close the cURL session
+    curl_close($ch);
+    
+    // Decode the JSON response
+    $exchangeData = json_decode($response, true);
 }
+   
+
+$output['status']['code'] = "200";
+
+$output['status']['name'] = "ok";
+
+$output['status']['description'] = "success";
+
+$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
+
+$output['data'] = $response;
+
+
+
+header('Content-Type: application/json; charset=UTF-8');
+
+
+
+echo json_encode($output);
+
+
 ?>
