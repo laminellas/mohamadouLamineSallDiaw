@@ -100,6 +100,7 @@ $(document).ready(function () {
     alert("Geolocation is not supported by your browser.");
   }
 });
+// modal1
 $('#countryDropdown').change(function(){
 $.ajax({
   url: "currencyExchange.php",
