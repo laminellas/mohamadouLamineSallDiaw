@@ -355,10 +355,45 @@
             
           </tr>           
         </table>
+      
+<div id="modal1" class="modal" data-bs-backdrop="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-success bg-gradient text-white" id="exchange-rate">
+        <h5 class="modal-title">currency</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+      <div class="modal-body">
+        <form id="currency-converter">
+          
+          <label for="amount">Enter Amount:</label>
+          <input type="number" id="amount" name="amount" required>
+  
+         
+          <label for="from-currency">From Currency:</label>
+          <select id="from-currency" name="from-currency" required>
+              
+          </select>
+  
+          
+          <label for="to-currency">To Currency:</label>
+          <select id="to-currency" name="to-currency" required>
+              <option value="USD">USD</option>
+              
+          </select>
+  
+          <!-- Button to trigger conversion -->
+          <button type="button" id="convert-btn">Convert</button>
+      </form>
+  
+      
+      <div id="result"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+        
       </div>
+      
     </div>
   </div>
 </div>
