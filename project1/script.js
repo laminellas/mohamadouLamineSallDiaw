@@ -101,34 +101,82 @@ $(document).ready(function () {
   }
 });
 // modal1
-$('#countryDropdown').change(function(){
-$.ajax({
-  url: "currencyExchange.php",
-  type: 'GET',
-  dataType: 'json',
-  success: function (data) {
-    console.log(data);
-    if (data.status.code === "200") {
-        // Successfully retrieved exchange rates
-        var rates = data.data;
-        var output = '<h2>Exchange Rates</h2><ul>';
-        
-        // Loop through exchange rates and display them
-        $.each(rates, function (currency, rate) {
-            output += '<li><strong>' + currency + '</strong>: ' + rate + '</li>';
-        });
-        
-        output += '</ul>';
-        $('#modal-body').html(output);
-    } else {
-        // Error handling if API request fails
-        $('#modal-body').html('<h2>Error fetching exchange rates: ' + data.status.description + '</h2>');
-    }
-},error:function(jqXHR, textStatus, errorThrown){
 
-    console.log(jqXHR);
 
-}
+$('#countryDropdown').change(function() {
+  // Fetch available exchange rates from your PHP API
+  function fetchExchangeRates() {
+      return $.ajax({
+          url: 'currencyExchange.php', // Replace with the actual path to your PHP script
+          type: 'GET',
+          dataType: 'json',
+          success: function(data) {
+              return data;
+          },
+          error: function(xhr, status, error) {
+              console.log("Error fetching exchange rates:", error);
+          }
+      });
+  }
 
-}); 
+  // Populate currency dropdowns dynamically
+  function populateCurrencyDropdowns(rates) {
+      let fromDropdown = $('#from-currency');
+      let toDropdown = $('#to-currency');
+      
+      // Iterate through the exchange rates and add them as options
+      $.each(rates, function(currency) {
+          fromDropdown.append(`<option value="${currency}">${currency}</option>`);
+          toDropdown.append(`<option value="${currency}">${currency}</option>`);
+      });
+  }
+
+  // Fetch exchange rates and populate the dropdowns
+  fetchExchangeRates().done(function(response) {
+      if (response.status.code === "200") {
+          let rates = response.data;
+          populateCurrencyDropdowns(rates);
+      } else {
+          $('#result').html("Error fetching exchange rates.");
+      }
+  });
+
+  // Handle conversion when the "Convert" button is clicked
+  $('#convert-btn').click(function() {
+      let amount = parseFloat($('#amount').val());
+      let fromCurrency = $('#from-currency').val();
+      let toCurrency = $('#to-currency').val();
+
+     
+      if (isNaN(amount) || amount <= 0) {
+          $('#result').html("Please enter a valid amount.");
+          return;
+      }
+
+      fetchExchangeRates().done(function(response) {
+          if (response.status.code === "200") {
+              let rates = response.data;
+
+              // Get the exchange rates for the selected currencies
+              let fromRate = rates[fromCurrency];
+              let toRate = rates[toCurrency];
+
+              // Perform the currency conversion
+              let convertedAmount;
+              if (fromCurrency === 'USD') {
+                  convertedAmount = amount * toRate;  
+              } else if (toCurrency === 'USD') {
+                  convertedAmount = amount / fromRate;  
+              } else {
+                  // Convert between two non-USD currencies via USD
+                  convertedAmount = (amount / fromRate) * toRate;
+              }
+
+              // Display the result
+              $('#result').html(`${amount} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`);
+          } else {
+              $('#result').html("Error fetching exchange rates.");
+          }
+      });
+  });
 });
