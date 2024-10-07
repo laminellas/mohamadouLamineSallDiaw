@@ -6,19 +6,18 @@
     <title>Lamine's Gazeteer project</title>
     
    <link rel="stylesheet" href="style.css">
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-   <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-easybutton@2.4.0/src/easy-button.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 </head>
 <body>
-    <header class="d-flex align-items-center justify-content-between">
-        <h1 class="mb-0">Gazetteer</h1>
-        <span id="selectContainer" class="ms-3">
-        <select name="Dropdown" id="countryDropdown" class="form-select shadow-sm text-primary font-weight-bold rounded-left">
+    <header>
+        <!-- <h1 class="mb-0">Gazetteer</h1> -->
+        <span id="selectContainer">
+        <select name="Dropdown" id="countryDropdown" class="form-select shadow-sm text-center">
             <option value="" >Select an option</option>
         </select>
         </span>
@@ -37,7 +36,7 @@
         <h5 class="modal-title">Overview</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" id="modal-body">
         <table class="table table-striped">
           <tr>
 
@@ -60,7 +59,7 @@
               <i class="fa-solid fa-heart fa-xl text-success"></i>
             </td>
 
-            <td>
+            <td >
               Attribute
             </td>
 
@@ -355,39 +354,46 @@
             
           </tr>           
         </table>
-      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="modal1" class="modal" data-bs-backdrop="false" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content shadow">
-      <div class="modal-header bg-success bg-gradient text-white" id="exchange-rate">
-        <h5 class="modal-title">currency</h5>
+      <div class="modal-header bg-success bg-gradient text-white container d-flex align-items-center justify-content-center" id="exchange-rate">
+        <h5 class="modal-title text-center">World wirld currency exchange</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="currency-converter">
-          
+          <!-- Input to enter the amount -->
           <label for="amount">Enter Amount:</label>
-          <input type="number" id="amount" name="amount" required>
+          <input type="number" id="amount" name="amount" required><br>
   
-         
+          <!-- Dropdown to select the "from" currency -->
           <label for="from-currency">From Currency:</label>
           <select id="from-currency" name="from-currency" required>
-              
+              <!-- Populated by JavaScript based on fetched currencies -->
           </select>
   
-          
+          <!-- Dropdown to select the "to" currency (default to USD) -->
           <label for="to-currency">To Currency:</label>
           <select id="to-currency" name="to-currency" required>
               <option value="USD">USD</option>
-              
+              <!-- Populated by JavaScript based on fetched currencies -->
           </select>
   
           <!-- Button to trigger conversion -->
-          <button type="button" id="convert-btn">Convert</button>
+          <button type="button" id="convert-btn" class="btn btn-outline-success btn-md float-end">Convert</button>
       </form>
   
-      
-      <div id="result"></div>
+      <!-- Area to display the result -->
+          <div id="result"><p></p></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
@@ -397,10 +403,87 @@
     </div>
   </div>
 </div>
+
+<div id="modal2" class="modal" data-bs-backdrop="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-primary bg-gradient text-white" id="weather">
+        <h5 class="modal-title text-center">Current weather</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <button id="get-weather" class="btn btn-outline-primary mt-3">Get Weather</button>
+
+        <!-- Weather Result -->
+        <div id="weather-result" class="mt-4">
+            <!-- Weather information will be displayed here -->
+        </div>
+    
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+      
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!--Modal3-->
+<div id="modal3" class="modal" data-bs-backdrop="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-success bg-gradient text-white" id="weather">
+        <h5 class="modal-title text-center">wikipedia links</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <button id="wikipediaButton" class="btn btn-outline-success">Get Wikipedia Links</button>
+    
+    <div id="wikipedia-result" class="mt-4"></div>
+    
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+      
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!--Modal4-->
+
+<div id="modal4" class="modal" data-bs-backdrop="false" tabindex="-1"></div>
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-success bg-gradient text-white" id="weather">
+        <h5 class="modal-title text-center">Demographic Info</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <button id="getCountryInfo">Get Info</button>
+
+        
+        <div id="countryInfo">
+            <!-- <p><strong>Population:</strong> <span id="population"></span></p>
+            <p><strong>Ethnicity:</strong> <span id="ethnicity"></span></p> -->
+        </div>
+    
+    
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+      
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>liv
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
