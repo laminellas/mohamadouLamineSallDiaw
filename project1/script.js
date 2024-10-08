@@ -45,9 +45,7 @@ var basemaps = {
 };
 
 // buttons
-var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
-  $("#exampleModal").modal("show");
-});
+
 var currencyBtn = L.easyButton("fa-dollar-sign fa-xl", function (btn, map) {
   $("#modal1").modal("show");
 });
@@ -59,6 +57,9 @@ var weatherBtn = L.easyButton("fa-cloud-sun fa-xl", function (btn, map) {
 });
 var demographicBtn = L.easyButton("fa-city fa-xl", function (btn, map) {
     $("#modal4").modal("show");
+  });
+  var statisticBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
+    $("#modal5").modal("show");
   });
 // ---------------------------------------------------------
 // EVENT HANDLERS
@@ -76,11 +77,12 @@ $(document).ready(function () {
   layerControl = L.control.layers(basemaps).addTo(map);
   
   // Add the  buttons
-  infoBtn.addTo(map);
+ 
   currencyBtn.addTo(map);
   weatherBtn.addTo(map);
   wekipediaBtn.addTo(map);
   demographicBtn.addTo(map);
+  statisticBtn.addTo(map);
 
   // ---------------------------------------------------------
   // GET THE DEVICE LOCATION USING GEOLOCATION API
@@ -247,14 +249,14 @@ $(document).ready(function(){
               // Parse and display the weather information
               
               $('#weather-result').html(response);
-              $('#get-weather').hide();
+            //  $('#get-weather').hide();
           },
           error: function(xhr, status, error){
               console.error('Error fetching weather data:', xhr);
           }
 
       });
-      $('#country-select').change(function() {
+      $('#countryDropdown').change(function() {
         // Show the button again when a new country is selected
         $('#get-weather-btn').show();
     });
@@ -301,23 +303,78 @@ $(document).ready(function () {
 });
 
 //modal4 
-$(document).ready(function() {
-    $('#getCountryInfo').click(function() {
-        var countryCode = $('#countryDropdown').val();
+$("#getDataBtn").click(function() {
+    var selectedCountry = $("#countryDropdown").val(); // Get selected country code
 
-        // Make AJAX request to PHP script to fetch country data
-        $.ajax({
-            url: 'demographicsInfo.php',
-            method: 'GET',
-            data: { country: countryCode },
-            dataType: 'json',
-            success: function(response) {
-                $('#population').text(response.population);
-                $('#ethnicity').text(response.ethnicity);
-            },
-            error: function(xhr, status, error) {
-                console.log("Error: " + error, xhr);
+    $.ajax({
+        url: "demographicsInfo.php", // URL of the PHP script
+        type: "GET",
+        data: { country: selectedCountry },
+        dataType: "json",
+        success: function(response) {
+            if (response.error) {
+                $("#results4").html("<p>Error: " + response.error + "</p>");
+            } else {
+                // Display the population and gender distribution data
+                var output = "<h2>Country: " + selectedCountry + "</h2>";
+                output += "<p>Total Population: " + response.population + "</p>";
+                output += "<p>Male Percentage: " + response.male_percentage + "%</p>";
+                output += "<p>Female Percentage: " + response.female_percentage + "%</p>";
+                $("#results4").html(output);
             }
-        });
+        },
+        error: function() {
+            $("#results4").html("<p>An error occurred while fetching the data.</p>");
+        }
+    });
+});
+
+//modal5
+$(document).ready(function() {
+    // Populate country dropdown
+    $.ajax({
+        url: "getCountries.php", // PHP script to fetch country list
+        method: "GET",
+        dataType: "json",
+        success: function(data) {
+            $.each(data, function(index, country) {
+                $('#countryDropdown').append(new Option(country.name, country.alpha2Code));
+            });
+        },
+        error: function() {
+            alert("Error fetching countries.");
+        }
+    });
+
+    // Handle country selection
+    $("#countryDropdown").change(function() {
+        var selectedCountry = $(this).val();
+        if (selectedCountry) {
+            $.ajax({
+                url: "getCountryStats.php", // PHP script to fetch country statistics
+                method: "GET",
+                data: { countryCode: selectedCountry },
+                dataType: "json",
+                success: function(data) {
+                    if (data) {
+                        $('#countryStats').html(`
+                            <h2>${data.name}</h2>
+                            <p><strong>Population:</strong> ${data.population}</p>
+                            <p><strong>Area:</strong> ${data.area} km²</p>
+                            <p><strong>Region:</strong> ${data.region}</p>
+                            <p><strong>Subregion:</strong> ${data.subregion}</p>
+                            <p><strong>Timezones:</strong> ${data.timezones.join(", ")}</p>
+                        `);
+                    } else {
+                        $('#countryStats').html('<p>No data available.</p>');
+                    }
+                },
+                error: function() {
+                    $('#countryStats').html('<p>An error occurred while fetching the data.</p>');
+                }
+            });
+        } else {
+            $('#countryStats').html('');
+        }
     });
 });
