@@ -65,7 +65,6 @@ var demographicBtn = L.easyButton("fa-city fa-xl", function (btn, map) {
 // EVENT HANDLERS
 // ---------------------------------------------------------
 
-// initialise and add controls once DOM is ready
 $(document).ready(function () {
   
   // Create the map object and set the default tile layer
@@ -151,7 +150,6 @@ $(document).ready(function () {
         let rates = response.data;
         populateCurrencyDropdowns(rates);
 
-        // Write ajax request to country info API to get the currency code for the selected country
         $('#countryDropdown').change(function() {
             let selectedCountryCode = $(this).val(); // Get the selected country code from dropdown
 
@@ -163,7 +161,7 @@ $(document).ready(function () {
                     let currencies = data[0].currencies;
                     let currencyCode = Object.keys(currencies)[0];  // Get the first currency code
 
-                    // Select the matching currency in the "from-currency" dropdown
+                   
                     $('#from-currency').val(currencyCode);
                 },
                 error: function(error) {
@@ -188,7 +186,6 @@ $(document).ready(function () {
                 return;
             }
 
-            // Fetch exchange rates again (you could cache this in production)
             fetchExchangeRates().catch(function(err) {
                 console.log(err);
             }).done(function(response) {
