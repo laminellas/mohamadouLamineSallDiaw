@@ -24,13 +24,9 @@ $.ajax({
   }
   
 }); 
-
-// ---------------------------------------------------------
-// GLOBAL DECLARATIONS
-// ---------------------------------------------------------
 var map;
 
-// tile layers
+// Tile layers
 var streets = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
     attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
 });
@@ -40,82 +36,149 @@ var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/service
 });
 
 var basemaps = {
-  "Streets": streets,
-  "Satellite": satellite
+    "Streets": streets,
+    "Satellite": satellite
 };
 
-// buttons
-
+// Buttons
 var currencyBtn = L.easyButton("fa-dollar-sign fa-xl", function (btn, map) {
-  $("#modal1").modal("show");
+    $("#modal1").modal("show");
 });
 var weatherBtn = L.easyButton("fa-cloud-sun fa-xl", function (btn, map) {
-   $("#modal2").modal("show");
- });
- var wekipediaBtn = L.easyButton("fa-globe fa-xl", function (btn, map) {
-  $("#modal3").modal("show");
+    $("#modal2").modal("show");
+});
+var wekipediaBtn = L.easyButton("fa-globe fa-xl", function (btn, map) {
+    $("#modal3").modal("show");
 });
 var demographicBtn = L.easyButton("fa-city fa-xl", function (btn, map) {
     $("#modal4").modal("show");
-  });
-  var statisticBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
+});
+var statisticBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
     $("#modal5").modal("show");
-  });
-// ---------------------------------------------------------
-// EVENT HANDLERS
-// ---------------------------------------------------------
+});
 
+// Initialize the map
 $(document).ready(function () {
-  
-  // Create the map object and set the default tile layer
-  map = L.map("map", {
-    layers: [streets]
-  }).setView([54.5, -4], 6); // Initial view (centered on UK, change as needed)
-  
-  // Add layer control for basemaps
-  layerControl = L.control.layers(basemaps).addTo(map);
-  
-  // Add the  buttons
- 
-  currencyBtn.addTo(map);
-  weatherBtn.addTo(map);
-  wekipediaBtn.addTo(map);
-  demographicBtn.addTo(map);
-  statisticBtn.addTo(map);
+    map = L.map("map", {
+        layers: [streets]
+    }).setView([54.5, -4], 6); // Initial view (centered on UK, change as needed)
 
-  // ---------------------------------------------------------
-  // GET THE DEVICE LOCATION USING GEOLOCATION API
-  // ---------------------------------------------------------
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-        // Success callback: user location available
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
+    // Add layer control for basemaps
+    layerControl = L.control.layers(basemaps).addTo(map);
 
-        // Center the map at the user's location
-        map.setView([lat, lng], 13); // Zoom level 13 to focus on the current location
-        
-        // Add a marker at the user's current location
-        L.marker([lat, lng]).addTo(map)
-          .bindPopup("You are here!")
-          .openPopup();
-      },
-      function (error) {
-        // Error callback: handle any error
-        console.error("Geolocation failed: " + error.message);
-        alert("Unable to retrieve your location.");
-      }
-    );
-  } else {
-    // Geolocation is not supported by the browser
-    alert("Geolocation is not supported by your browser.");
-  }
+    // Add the buttons
+    currencyBtn.addTo(map);
+    weatherBtn.addTo(map);
+    wekipediaBtn.addTo(map);
+    demographicBtn.addTo(map);
+    statisticBtn.addTo(map);
+
+    // ---------------------------------------------------------
+    // GET THE DEVICE LOCATION USING GEOLOCATION API
+    // ---------------------------------------------------------
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                // Success callback: user location available
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+
+                // Center the map at the user's location
+                map.setView([lat, lng], 13); // Zoom level 13 to focus on the current location
+
+                // Add a marker at the user's current location
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup("You are here!")
+                    .openPopup();
+            },
+            function (error) {
+                // Error callback: handle any error
+                console.error("Geolocation failed: " + error.message);
+                alert("Unable to retrieve your location.");
+            }
+        );
+    } else {
+        // Geolocation is not supported by the browser
+        alert("Geolocation is not supported by your browser.");
+    }
+
+    var countryGeoJSON;
+
+    // Load GeoJSON for country borders
+    fetch('countryBorders.geo.json')
+        .then(response => response.json())
+        .then(data => {
+            countryGeoJSON = data;
+            L.geoJSON(countryGeoJSON).addTo(map);
+        });
+
+    $('#countryDropdown').change(function () {
+        var selectedCountry = $(this).val();
+        console.log("Selected Country Code:", selectedCountry); // Log the selected country code
+
+        if (selectedCountry) {
+            // Check if countryGeoJSON is loaded
+            if (!countryGeoJSON) {
+                console.error("GeoJSON data not loaded yet.");
+                return;
+            }
+
+            // Log the features in the GeoJSON
+            console.log("GeoJSON Features:", countryGeoJSON.features);
+
+            var selectedCountryGeoJSON = countryGeoJSON.features.find(feature => feature.properties.ISO_A2 === selectedCountry);
+
+            if (selectedCountryGeoJSON) {
+                var bounds = L.geoJSON(selectedCountryGeoJSON).getBounds();
+                map.fitBounds(bounds);
+
+                // Highlight the country
+                L.geoJSON(selectedCountryGeoJSON, {
+                    style: {
+                        color: 'blue',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.5
+                    }
+                }).addTo(map);
+
+                // Clear existing markers before adding new ones
+                if (window.countryMarkers) {
+                    window.countryMarkers.forEach(marker => map.removeLayer(marker));
+                }
+                window.countryMarkers = [];
+
+                // Fetch cities for the selected country from GeoNames API
+                fetch(`http://api.geonames.org/searchJSON?formatted=true&q=${selectedCountry}&maxRows=10&username=yourGeoNamesUsername`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.geonames) {
+                            data.geonames.forEach(city => {
+                                var countryMarker = L.marker([city.lat, city.lng])
+                                    .addTo(map)
+                                    .bindPopup(city.name)
+                                    .openPopup();
+                                window.countryMarkers.push(countryMarker);
+                            });
+                        } else {
+                            console.error("No city data found for the selected country.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching data from GeoNames:", error);
+                    });
+            } else {
+                console.error("Selected country data not found in GeoJSON");
+            }
+        }
+    });
 });
 
 
 
-
+                                       
+            
+        
   // Fetch available exchange rates from your PHP API
   function fetchExchangeRates() {
       return $.ajax({
@@ -150,6 +213,7 @@ $(document).ready(function () {
         let rates = response.data;
         populateCurrencyDropdowns(rates);
 
+        // Write ajax request to country info API to get the currency code for the selected country
         $('#countryDropdown').change(function() {
             let selectedCountryCode = $(this).val(); // Get the selected country code from dropdown
 
@@ -161,7 +225,7 @@ $(document).ready(function () {
                     let currencies = data[0].currencies;
                     let currencyCode = Object.keys(currencies)[0];  // Get the first currency code
 
-                   
+                    // Select the matching currency in the "from-currency" dropdown
                     $('#from-currency').val(currencyCode);
                 },
                 error: function(error) {
@@ -186,6 +250,7 @@ $(document).ready(function () {
                 return;
             }
 
+            // Fetch exchange rates again (you could cache this in production)
             fetchExchangeRates().catch(function(err) {
                 console.log(err);
             }).done(function(response) {
@@ -231,10 +296,12 @@ $(document).ready(function () {
 $(document).ready(function(){
   
   // Handle the weather button click event
-  $('#get-weather').click(function() {
+  $('#countryDropdown').change(function() {
       // Get selected country code from the dropdown
       let countryCode = $('#countryDropdown').val();
+      var countries = $(this).val();
 
+    if (countries) {
       // Make AJAX request to the PHP script to get weather data
       $.ajax({
           url: 'weather.php',  // PHP file that fetches weather from OpenWeather API
@@ -253,84 +320,62 @@ $(document).ready(function(){
           }
 
       });
-      $('#countryDropdown').change(function() {
-        // Show the button again when a new country is selected
-        $('#get-weather-btn').show();
-    });
+    } else {
+        $('#weather-result').html('Select a country to display news.');
+    }
   });
 });
 
 //modal3
 
 
-  
 $(document).ready(function () {
     // When the "Get Wikipedia Link" button is clicked
-    $('#wikipediaButton').click(function () {
+    $('#countryDropdown').change(function () {
         // Get the selected country
         var selectedCountry = $('#countryDropdown').val();
 
         // Make an AJAX request to the PHP backend
         $.ajax({
-            url: 'getCountryId.php',
+            url: 'getCountryId.php', // Adjust the PHP URL if necessary
             method: 'GET',
             data: { country: selectedCountry },
             success: function (response) {
+                
                 // Parse the JSON response
                 var result = JSON.parse(response);
-
+                console.log(result.wikiUrl);
                 // Check if the request was successful
                 if (result.status === 'success') {
-                    // Display the Wikipedia link
+                    // Display the Wikipedia summary and link from the GeoNames API response
                     $('#wikipedia-result').html(
-                        '<a href="' + result.wikiUrl + '" target="_blank">' +
-                        'Click here to read about ' + selectedCountry + ' on Wikipedia' +
-                        '</a>'
+                        '<div>' +
+                            '<p><strong>Summary:</strong> ' + result.summary + '</p>' + // Show the summary
+                            '<p><a href="' + result.wikiUrl + '" target="_blank">' +
+                            'Click here to read more about ' + selectedCountry + ' on Wikipedia' +
+                            '</a></p>' +
+                        '</div>'
                     );
                 } else {
-                    // Display an error message
+                    // Display an error message if unsuccessful
                     $('#wikipedia-result').html('<div class="alert alert-danger">' + result.message + '</div>');
                 }
             },
-            error: function () {
-                $('#wikipedia-result').html('<div class="alert alert-danger">Error fetching Wikipedia link.</div>');
+            error: function (xhr, status, error) {
+                // Handle AJAX errors
+                $('#wikipedia-result').html('<div class="alert alert-danger">Error fetching Wikipedia summary.</div>', xhr);
             }
         });
     });
 });
 
 //modal4 
-$("#getDataBtn").click(function() {
-    var selectedCountry = $("#countryDropdown").val(); // Get selected country code
 
-    $.ajax({
-        url: "demographicsInfo.php", // URL of the PHP script
-        type: "GET",
-        data: { country: selectedCountry },
-        dataType: "json",
-        success: function(response) {
-            if (response.error) {
-                $("#results4").html("<p>Error: " + response.error + "</p>");
-            } else {
-                // Display the population and gender distribution data
-                var output = "<h2>Country: " + selectedCountry + "</h2>";
-                output += "<p>Total Population: " + response.population + "</p>";
-                output += "<p>Male Percentage: " + response.male_percentage + "%</p>";
-                output += "<p>Female Percentage: " + response.female_percentage + "%</p>";
-                $("#results4").html(output);
-            }
-        },
-        error: function() {
-            $("#results4").html("<p>An error occurred while fetching the data.</p>");
-        }
-    });
-});
 
-//modal5
 $(document).ready(function() {
     // Populate country dropdown
     $.ajax({
-        url: "getCountries.php", // PHP script to fetch country list
+        url: "getCountries.php", 
         method: "GET",
         dataType: "json",
         success: function(data) {
@@ -338,40 +383,90 @@ $(document).ready(function() {
                 $('#countryDropdown').append(new Option(country.name, country.alpha2Code));
             });
         },
-        error: function() {
-            alert("Error fetching countries.");
+        error: function(xhr, status, error) {
+            alert("Error fetching countries.", xhr);
         }
     });
 
     // Handle country selection
-    $("#countryDropdown").change(function() {
+    $(document).ready(function () {
+        $('#countryDropdown').change(function () {
+            var selectedCountry = $(this).val();
+            if (selectedCountry) {
+                $.ajax({
+                    url: 'getCountryStats.php', 
+                    method: 'GET',
+                    data: { countryCode: selectedCountry },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data) {
+                            // Display country details, including population, area, region, etc.
+                            $('#countryStats').html(`
+                                <h2>${data.name}</h2>
+                                <p><strong>Population:</strong> ${data.population}</p>
+                                <p><strong>Area:</strong> ${data.area} km²</p>
+                                <p><strong>Region:</strong> ${data.region}</p>
+                                <p><strong>Subregion:</strong> ${data.subregion}</p>
+                                <p><strong>Timezones:</strong> ${data.timezones.join(", ")}</p>
+                                <p><strong>Borders:</strong> ${data.borders.length > 0 ? data.borders.join(", ") : 'No bordering countries'}</p>
+                                <p><strong>Flag:</strong></p>
+                                <img src="${data.flag}" alt="Flag of ${data.name}" style="width: 150px;">
+                            `);
+                        } else {
+                            $('#countryStats').html('<p>No data available.</p>');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('#countryStats').html('<p>An error occurred while fetching the data.</p>');
+                    }
+                });
+            } else {
+                $('#countryStats').html('');
+            }
+        });
+    });
+});
+    
+    
+//modal5
+
+$(document).ready(function () {
+    $('#countryDropdown').change(function () {
         var selectedCountry = $(this).val();
+        
         if (selectedCountry) {
             $.ajax({
-                url: "getCountryStats.php", // PHP script to fetch country statistics
-                method: "GET",
+                url: 'getCountryData.php',
+                method: 'GET',
                 data: { countryCode: selectedCountry },
-                dataType: "json",
-                success: function(data) {
-                    if (data) {
-                        $('#countryStats').html(`
-                            <h2>${data.name}</h2>
-                            <p><strong>Population:</strong> ${data.population}</p>
-                            <p><strong>Area:</strong> ${data.area} km²</p>
-                            <p><strong>Region:</strong> ${data.region}</p>
-                            <p><strong>Subregion:</strong> ${data.subregion}</p>
-                            <p><strong>Timezones:</strong> ${data.timezones.join(", ")}</p>
+                success: function (response) {
+                    var result = JSON.parse(response);
+                    console.log(response);
+                    
+                    if (result.status === 'success') {
+                        // Display historical population data
+                        var populationData = result.historicalPopulation;
+                        var gdpData = result.gdpData;
+
+                        $('#countryStat').html(`
+                            <h2>Country Data</h2>
+                            <h3>Population (2000-2022)</h3>
+                            <ul>
+                                ${populationData.map(data => `<li>${data.date}: ${data.value.toLocaleString()}</li>`).join('')}
+                            </ul>
+                            <h3>GDP (Latest)</h3>
+                            <p>GDP: ${gdpData.value ? gdpData.value.toLocaleString() : 'Data not available'}</p>
                         `);
                     } else {
-                        $('#countryStats').html('<p>No data available.</p>');
+                        $('#countryStat').html('<div class="alert alert-danger">' + result.message + '</div>');
                     }
                 },
-                error: function() {
-                    $('#countryStats').html('<p>An error occurred while fetching the data.</p>');
+                error: function () {
+                    $('#countryStat').html('<div class="alert alert-danger">An error occurred while fetching the data.</div>');
                 }
             });
         } else {
-            $('#countryStats').html('');
+            $('#countryStat').html('');
         }
     });
 });
