@@ -149,7 +149,7 @@ $(document).ready(function () {
                 window.countryMarkers = [];
 
                 // Fetch cities for the selected country from GeoNames API
-                fetch(`http://api.geonames.org/searchJSON?formatted=true&q=${selectedCountry}&maxRows=10&username=yourGeoNamesUsername`)
+                fetch(`http://api.geonames.org/searchJSON?formatted=true&q=${selectedCountry}&maxRows=10&username=alamine`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.geonames) {
